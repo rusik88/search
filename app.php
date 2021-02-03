@@ -1,7 +1,5 @@
 <?php
 
-session_start();
-
 require_once ($_SERVER['DOCUMENT_ROOT'].'/config.php');
 
 require 'vendor/autoload.php';
@@ -13,8 +11,14 @@ use Classes\SearchClass;
 $app = new AppClass(CONNECT_IP, CONNECT_PORT);
 $client = new SearchClass($app->getClient());
 
-$app->importData($data);
+if(isset($_GET['find']) && $_GET['find'] == 'yes') {
+    $client->filter($_POST);
+    die();
+}
 
+$client->importData($data);
+
+/*
 $params['index'] = 'users';
 $params['type'] = 'user';
 
@@ -42,7 +46,7 @@ $params = [
     ]
 ];
 
-printr($app->getClient()->search($params));
+printr($app->getClient()->search($params));*/
 
 
 /*printr($client->search([

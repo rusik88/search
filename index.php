@@ -1,5 +1,5 @@
 <?php
-require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
+//require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
 ?>
 
 <!doctype html>
@@ -18,38 +18,54 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
 <div class="container ">
     <div class="row">
         <div class="col-6 gy-5">
-        <form class="">
+        <form id="formSearch">
             <div class="mb-3 col-10">
-                <label class="form-label">Age</label>
+                <label class="form-label">Возраст</label>
                 <div class="row">
-                    <div class="col-3"><input type="text" class="form-control minField" value="0"></div>
-                    <div class="col-3"><input type="text" class="form-control" value="30"></div>
+                    <div class="col-3"><input type="text" name="age_min" class="form-control minField" value="0"></div>
+                    <div class="col-3"><input type="text" name="age_max" class="form-control" value="30"></div>
                 </div>
             </div>
             <div class="mb-3 col-10">
-                <label for="exampleInputEmail1" class="form-label">Name</label>
+                <label for="exampleInputEmail1" class="form-label">Имя</label>
                 <input type="text" class="form-control" name="name">
             </div>
             <div class="mb-3 col-10">
                 <label for="exampleInputEmail1" class="form-label">Email</label>
-                <input type="email" class="form-control" name="mail">
+                <input type="email" class="form-control" name="email">
             </div>
             <div class="mb-3 col-10">
-                <label for="exampleInputEmail1" class="form-label">Phone</label>
+                <label for="exampleInputEmail1" class="form-label">Телефон</label>
                 <input type="number" class="form-control" name="phone">
-                <div id="emailHelp" class="form-text">Поиск только по 3-м цыфрам оператора</div>
+                <div id="emailHelp" class="form-text">Поиск только по 3-м цифрам оператора</div>
             </div>
-            <button type="submit" id="sendFilter" class="btn btn-primary">Фильтровать</button>
+            <button type="submit" id="sendFilter" class="btn btn-primary">Найти</button>
         </form>
         </div>
         <div class="col-6 gy-5">
-            <ul class="list-group">
-                <li class="list-group-item">Cras justo odio</li>
-                <li class="list-group-item">Dapibus ac facilisis in</li>
-                <li class="list-group-item">Morbi leo risus</li>
-                <li class="list-group-item">Porta ac consectetur ac</li>
-                <li class="list-group-item">Vestibulum at eros</li>
-            </ul>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Возраст</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Телефон</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td scope="row" colspan="5">Нет записей</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>21</td>
+                        <td>test@test.com</td>
+                        <td>+380972417589</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -71,8 +87,17 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
     $('input[name="age"]').val(0);
     $('#sendFilter').on('click', function(e) {
         e.preventDefault();
-        console.log($('input[name="age"]').val());
+        jQuery.ajax({
+            type: 'post',
+            url: '/?find=yes',		
+			data: jQuery('#formSearch').serialize(),
+            dataType: 'json',
+            success:function(json){
+                console.log(json);
+            }
+        });
     });
+
 </script>
 
 <!-- Option 2: Separate Popper and Bootstrap JS -->
