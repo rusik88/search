@@ -1,0 +1,11 @@
+{
+  "name": "elasticsearch/form",
+  "autoload": {
+    "psr-4": {
+      "Classes\\": "Classes"
+    }
+  },
+  "require": {
+    "elasticsearch/elasticsearch": "^7.0"
+  }
+}
