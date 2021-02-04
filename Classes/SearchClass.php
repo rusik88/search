@@ -6,8 +6,8 @@ namespace Classes;
 class SearchClass
 {
     private $builderClient;
-    private $index = 'users';
-    private $type = 'user';
+    private $index = DB_INDEX;
+    private $type = DB_TYPE;
 
     public function __construct($builderClient)
     {
@@ -16,8 +16,7 @@ class SearchClass
 
     public function importData($data = array())
     {
-        $data_rows = [];
-        if (!$this->getClient()->indices()->exists(['index' => $this->index])) {
+        if (!$this->builderClient->indices()->exists(['index' => $this->index])) {
             if (
                 !empty($data) &&
                 isset($data['age']) && !empty($data['age']) &&
@@ -38,51 +37,56 @@ class SearchClass
                         'type' => $this->type,
                         'body' => $row
                     ];
-                    $this->builderClient->client->index($params);
+                    $this->builderClient->index($params);
                 }
             }
         }
     }
 
     public function search($match_arr = array()) {
-        $params = [
-            'index' => $this->index,
-            'size'   => LIMIT_SEARCH,
-            'body'  => [
-                'query' => $match_arr
-            ]
-        ];
 
-        return $this->builderClient->search($params);
+        if(!empty($match_arr)) {
+            $params = [
+                'index' => $this->index,
+                'size'   => LIMIT_SEARCH,
+                'body'  => [
+                    'query' => $match_arr
+                ]
+            ];
+            return $this->builderClient->search($params);
+        } else {
+            return array();
+        }
     }
 
     public function filter($post) {
         $data = array();
+
         $data['bool']['must'] = array();
 
         if(isset($post['name']) && !empty($post['name'])) {
-            $data['bool']['must'][] = ['regexp' => ['name' => $post['name'].'.*']]
+            $data['bool']['must'][] = ['regexp' => ['name' => mb_strtolower($post['name']).'.*']];
         }
 
         if(isset($post['phone']) && !empty($post['phone'])) {
             $data['bool']['must'][] = ['regexp' => ['phone' => '.*38'.$post['phone'].'.*']];
         }
 
-        if(
-            isset($post['age_min']) && !empty($post['age_min']) &&
-            isset($post['age_max']) && !empty($post['age_max'])
-        ) {
-            $data['bool']['must'][] = ['range' => [
-                'age' => [
-                    'gte' => $post['age_min'],
-                    'lte' => $post['age_max'],
-                ],
-            ]];
-        }
+        $age_min = isset($post['age_min']) && !empty($post['age_min']) ? $post['age_min'] : 0;
+        $age_max = isset($post['age_max']) && !empty($post['age_max']) ? $post['age_max'] : 0;
+
+        $data['bool']['must'][] = ['range' => [
+            'age' => [
+                'gte' => $age_min,
+                'lte' => $age_max,
+            ],
+        ]];
 
         if(isset($post['email']) && !empty($post['email'])) {
-            $data['bool']['must'][] = ['match' => ['email' => $post['email']]]
+            $data['bool']['must'][] = ['match' => ['email' => $post['email']]];
         }
+
+        if(empty($data['bool']['must'])) return array();
 
         return $this->search($data);
     }

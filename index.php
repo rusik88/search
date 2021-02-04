@@ -1,18 +1,16 @@
 <?php
-//require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/app.php');
 ?>
 
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>Фильтрация Elasticsearch</title>
 </head>
 <body>
 <div class="container ">
@@ -43,7 +41,7 @@
         </form>
         </div>
         <div class="col-6 gy-5">
-            <table class="table">
+            <table class="table" id="usersTable">
                 <thead>
                     <tr>
                     <th scope="col">#</th>
@@ -57,31 +55,17 @@
                     <tr>
                         <td scope="row" colspan="5">Нет записей</td>
                     </tr>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>21</td>
-                        <td>test@test.com</td>
-                        <td>+380972417589</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-
-
-
-<!-- Optional JavaScript; choose one of the two! -->
-
-<!-- Option 1: Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 <script
     src="https://code.jquery.com/jquery-3.5.1.min.js"
     integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
     crossorigin="anonymous"></script>
-
 
 <script>
     $('input[name="age"]').val(0);
@@ -93,18 +77,27 @@
 			data: jQuery('#formSearch').serialize(),
             dataType: 'json',
             success:function(json){
-                console.log(json);
+                var tpl = '';
+                if(json.length > 0) {
+                    for (const item in json) {
+                        tpl += '<tr>';
+                            tpl += '<td>'+json[item]['_id']+'</td>';
+                            tpl += '<td>'+json[item]['_source']['name']+'</td>';
+                            tpl += '<td>'+json[item]['_source']['age']+'</td>';
+                            tpl += '<td>'+json[item]['_source']['email']+'</td>';
+                            tpl += '<td>'+json[item]['_source']['phone']+'</td>';
+                        tpl += '</tr>';
+                    }
+                } else {
+                    tpl = '<tr><td scope="row" colspan="5">Нет записей</td></tr>';
+                }
+                $("#usersTable tbody").html(tpl);
             }
         });
     });
 
 </script>
 
-<!-- Option 2: Separate Popper and Bootstrap JS -->
-<!--
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
--->
 </body>
 </html>
 
